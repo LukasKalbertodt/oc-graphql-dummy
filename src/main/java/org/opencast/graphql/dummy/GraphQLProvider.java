@@ -54,6 +54,7 @@ public class GraphQLProvider {
             .type(newTypeWiring("Query")
                 .dataFetcher("eventById", graphQLDataFetchers.getEventById())
                 .dataFetcher("seriesById", graphQLDataFetchers.getSeriesById())
+                .dataFetcher("events", graphQLDataFetchers.getEvents())
             )
             .build();
     }

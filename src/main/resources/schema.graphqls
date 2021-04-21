@@ -1,6 +1,7 @@
 type Query {
   eventById(id: ID!): Event
   seriesById(id: ID!): Series
+  events(sortBy: EventSort): EventConnection
 }
 
 type Event {
@@ -17,4 +18,26 @@ type Series {
   id: ID!
   name: String!
   description: String
+}
+
+type EventConnection {
+  edges: [EventEdge!]!
+  pageInfo: PageInfo!
+}
+
+type EventEdge {
+  cursor: String!
+  node: Event!
+}
+
+type PageInfo {
+  endCursor: String!
+  startCursor: String!
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+}
+
+enum EventSort {
+  TITLE
+  DURATION
 }
