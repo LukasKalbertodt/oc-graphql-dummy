@@ -1,7 +1,7 @@
 type Query {
   eventById(id: ID!): Event
   seriesById(id: ID!): Series
-  events(sortBy: EventSort): EventConnection
+  events(sortBy: EventSort, limit: Int, after: String): EventConnection
 }
 
 type Event {

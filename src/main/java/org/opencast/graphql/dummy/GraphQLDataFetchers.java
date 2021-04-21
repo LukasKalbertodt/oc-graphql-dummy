@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.OptionalInt;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -38,9 +40,10 @@ public class GraphQLDataFetchers {
     public DataFetcher getEvents() {
         return dataFetchingEnvironment -> {
             String sortBy = dataFetchingEnvironment.getArgument("sortBy");
-            //String after = dataFetchingEnvironment.getArgument("after");
-            //int count = dataFetchingEnvironment.getArgument("count");
+            String after = dataFetchingEnvironment.getArgument("after");
+            int limit = dataFetchingEnvironment.getArgumentOrDefault("limit", Integer.MAX_VALUE);
 
+            // Sort events
             var events = Data.events.clone();
             if (sortBy.equals("TITLE")) {
                 Arrays.sort(events, Comparator.comparing(a -> a.title));
@@ -48,15 +51,28 @@ public class GraphQLDataFetchers {
                 Arrays.sort(events, Comparator.comparing(a -> a.duration));
             }
 
+            // Restrict events to requested range
+            int skip = after == null ? 0 : IntStream.range(0, events.length)
+                .filter(i -> events[i].id.equals(after))
+                .map(i -> i + 1)
+                .findFirst()
+                .orElse(events.length - 1);
             var edges = Arrays.stream(events)
-                    .map(event -> new DefaultEdge<Event>(event, new DefaultConnectionCursor(event.id)))
-                    .collect(Collectors.toList());
-            
+                .skip(skip)
+                .limit(limit)
+                .map(event -> new DefaultEdge<Event>(event, new DefaultConnectionCursor(event.id)))
+                .collect(Collectors.toList());
+
+            // Collect page information
+            var startCursor = edges.isEmpty() ? null : edges.get(0).getNode().id;
+            var endCursor = edges.isEmpty() ? null : edges.get(edges.size() - 1).getNode().id;
+            var hasPreviousPage = skip != 0;
+            var hasNextPage = limit - 1 < events.length;
             var pageInfo = new DefaultPageInfo(
-                new DefaultConnectionCursor(edges.get(0).getNode().id),
-                new DefaultConnectionCursor(edges.get(edges.size() - 1).getNode().id),
-                false,
-                false
+                new DefaultConnectionCursor(startCursor),
+                new DefaultConnectionCursor(endCursor),
+                hasPreviousPage,
+                hasNextPage
             );
 
             return new DefaultConnection(edges, pageInfo);
