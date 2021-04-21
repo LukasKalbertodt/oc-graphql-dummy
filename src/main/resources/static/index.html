@@ -10,24 +10,72 @@
     </style>
 </head>
 <body>
+    <h1>Opencast Dummy GraphQL API</h1>
     <p>
         This webapp provides a Opencast-like dummy GraphQL API.
-        This way, it's easier to play with the API and everyone in the community can get familiar with GraphQL.
+        This way, everyone in the community can play around with the API and get familiar with GraphQL.
     </p>
     <p>
         The actual API is available at <code>/graphql</code>.
         But to play with it, you probably want to use the included mini IDE GraphiQL, which is mounted here: <a href="/graphiql"><code>/graphiql</code></a>.
         On the right side, you can see the whole API schema.
         You can use ctrl+space to get auto-completions in the editor on the left.
+        To see what the actual network requests are (spoiler: they are very simple), use your browser's dev tools.
     </p>
-    <p>
-        Example query:
-    </p>
+    <h2>Example queries (to get started):</h2>
+    <p>Single event by ID:</p>
     <pre>
-query {
-    TODO
-}
+    query {
+      eventById(id:"01234567-abcd-abcd-abcd-000000000001") {
+        title
+        description
+        duration
+      }
+    }
+    </pre>
+    <p>All events sorted and with a limit:</p>
+    <pre>
+    query {
+      events(sortBy:DURATION limit:3) {
+        edges {
+          node {
+            title
+            description
+          }
+        }
+      }
+    }
+    </pre>
+    <p>All events of a specific series:</p>
+    <pre>
+    query {
+      seriesById(id:"76543210-abcd-abcd-abcd-000000000001") {
+        events(sortBy:TITLE) {
+          edges {
+            node {
+              title
+              duration
+              series { id }
+            }
+          }
+        }
+      }
+    }
     </pre>
 
+    <h2>Note about "connections", pagination and long lists</h2>
+    <p>
+        Some fields in the API (e.g. <code>events</code> or <code>Series.events</code>) don't just return a simple array.
+        That's because those lists can potentially become very long.
+        In those cases, it's best practice to use so called "connections".
+        This is a powerful pattern that allows for different ways of doing pagination.
+        If you just want the whole list, just request <code>edges { node { ... } }</code>.
+        The cursor and page information just helps frontends with pagination.
+    </p>
+    <p>
+        This API right here currently does not support going to the previous page.
+        But that's just because I didn't implement it.
+        It's straight forward to add.
+    </p>
 </body>
 </html>
