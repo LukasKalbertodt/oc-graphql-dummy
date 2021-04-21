@@ -1,16 +1,20 @@
 type Query {
-  bookById(id: ID): Book
+  eventById(id: ID!): Event
+  seriesById(id: ID!): Series
 }
 
-type Book {
-  id: ID
-  name: String
-  pageCount: Int
-  author: Author
+type Event {
+  id: ID!
+  title: String!
+  description: String
+  "Duration in seconds"
+  duration: Float!
+  series: Series
 }
 
-type Author {
-  id: ID
-  firstName: String
-  lastName: String
+"A series. Can contain multiple events."
+type Series {
+  id: ID!
+  name: String!
+  description: String
 }
