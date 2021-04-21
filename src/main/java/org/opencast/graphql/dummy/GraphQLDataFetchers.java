@@ -9,6 +9,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.swing.text.html.Option;
+
+import graphql.relay.Connection;
 import graphql.relay.DefaultConnection;
 import graphql.relay.DefaultConnectionCursor;
 import graphql.relay.DefaultEdge;
@@ -43,39 +46,59 @@ public class GraphQLDataFetchers {
             String after = dataFetchingEnvironment.getArgument("after");
             int limit = dataFetchingEnvironment.getArgumentOrDefault("limit", Integer.MAX_VALUE);
 
-            // Sort events
-            var events = Data.events.clone();
-            if (sortBy.equals("TITLE")) {
-                Arrays.sort(events, Comparator.comparing(a -> a.title));
-            } else if (sortBy.equals("DURATION")) {
-                Arrays.sort(events, Comparator.comparing(a -> a.duration));
+            return eventConnection(sortBy, limit, after, null);
+        };
+    }
+
+    public static Connection eventConnection(String sortBy, int limit, String after, String seriesId) {
+        var events = Data.events.clone();
+
+        // Filter by series, if a series is specified
+        if (seriesId != null) {
+            events = Arrays.stream(events)
+                .filter(event -> seriesId.equals(event.seriesID))
+                .toArray(Event[]::new);
+        }
+
+        // Sort events
+        if ("TITLE".equals(sortBy)) {
+            Arrays.sort(events, Comparator.comparing(a -> a.title));
+        } else if ("DURATION".equals(sortBy)) {
+            Arrays.sort(events, Comparator.comparing(a -> a.duration));
+        }
+
+        // Restrict events to requested range
+        var edgesPlusOne = Arrays.stream(events)
+            .filter(after == null ? x -> true : skipUntilAfter(event -> event.id.equals(after)))
+            .limit(1 + (long)limit)
+            .map(event -> new DefaultEdge<Event>(event, new DefaultConnectionCursor(event.id)))
+            .collect(Collectors.toList());
+        var edges = edgesPlusOne.size() == limit + 1 ? edgesPlusOne.subList(0, limit) : edgesPlusOne;
+
+        // Collect page information
+        var startCursor = edges.isEmpty()
+            ? null
+            : new DefaultConnectionCursor(edges.get(0).getNode().id);
+        var endCursor = edges.isEmpty()
+            ? null
+            : new DefaultConnectionCursor(edges.get(edges.size() - 1).getNode().id);
+        var hasPreviousPage = after != null;
+        var hasNextPage = edgesPlusOne.size() == limit + 1;
+        var pageInfo = new DefaultPageInfo(startCursor, endCursor, hasPreviousPage, hasNextPage);
+
+        return new DefaultConnection(edges, pageInfo);
+    }
+
+    private static <T> Predicate<T> skipUntilAfter(Predicate<T> predicate) {
+        boolean[] seen = { false };
+        return t -> {
+            if (seen[0]) {
+                return true;
             }
-
-            // Restrict events to requested range
-            int skip = after == null ? 0 : IntStream.range(0, events.length)
-                .filter(i -> events[i].id.equals(after))
-                .map(i -> i + 1)
-                .findFirst()
-                .orElse(events.length - 1);
-            var edges = Arrays.stream(events)
-                .skip(skip)
-                .limit(limit)
-                .map(event -> new DefaultEdge<Event>(event, new DefaultConnectionCursor(event.id)))
-                .collect(Collectors.toList());
-
-            // Collect page information
-            var startCursor = edges.isEmpty() ? null : edges.get(0).getNode().id;
-            var endCursor = edges.isEmpty() ? null : edges.get(edges.size() - 1).getNode().id;
-            var hasPreviousPage = skip != 0;
-            var hasNextPage = limit - 1 < events.length;
-            var pageInfo = new DefaultPageInfo(
-                new DefaultConnectionCursor(startCursor),
-                new DefaultConnectionCursor(endCursor),
-                hasPreviousPage,
-                hasNextPage
-            );
-
-            return new DefaultConnection(edges, pageInfo);
+            if (predicate.test(t)) {
+                seen[0] = true;
+            }
+            return false;
         };
     }
 }
