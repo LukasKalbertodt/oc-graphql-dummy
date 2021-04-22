@@ -11,6 +11,7 @@ type Event {
   "Duration in seconds"
   duration: Float!
   series: Series
+  tracks: [Track!]!
 }
 
 "A series. Can contain multiple events."
@@ -41,4 +42,12 @@ type PageInfo {
 enum EventSort {
   TITLE
   DURATION
+}
+
+type Track {
+  mimetype: String
+  url: String
+  framerate: Float
+  width: Int
+  height: Int
 }
