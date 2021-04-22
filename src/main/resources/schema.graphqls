@@ -1,6 +1,9 @@
 type Query {
+  "Fetch a specific event by ID"
   eventById(id: ID!): Event
+  "Fetch a specific series by ID"
   seriesById(id: ID!): Series
+  "List all events. Returns a connection to allow pagination."
   events(sortBy: EventSort, limit: Int, after: String): EventConnection!
 }
 
@@ -22,6 +25,11 @@ type Series {
   events(sortBy: EventSort, limit: Int, after: String): EventConnection!
 }
 
+"""
+A list of events with meta information to allow for flexible pagination.
+
+To just retrieve all data, use `edges { node { ... } }`.
+"""
 type EventConnection {
   edges: [EventEdge!]!
   pageInfo: PageInfo!
@@ -33,7 +41,12 @@ type EventEdge {
 }
 
 type PageInfo {
+  """
+  The cursor of the last event in the connection. This is what you want to pass as `after` parameter
+  to get the next page.
+  """
   endCursor: String
+  "Cursor of first event. Currently useless as there is no `before` equivalent to `after`."
   startCursor: String
   hasPreviousPage: Boolean!
   hasNextPage: Boolean!
