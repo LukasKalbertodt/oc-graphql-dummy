@@ -7,9 +7,26 @@
         body {
             font-family: sans;
         }
+        pre {
+            margin-left: 24px;
+            background-color: #f8f8f8;
+            padding: 4px 8px;
+        }
+        main {
+            max-width: 900px;
+            margin: auto;
+            line-height: 1.3;
+        }
+        code {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1px 2px;
+        }
     </style>
 </head>
 <body>
+<main>
     <h1>Opencast Dummy GraphQL API</h1>
     <p>
         This webapp provides a Opencast-like dummy GraphQL API.
@@ -25,42 +42,42 @@
     <h2>Example queries (to get started):</h2>
     <p>Single event by ID:</p>
     <pre>
-    query {
-      eventById(id:"01234567-abcd-abcd-abcd-000000000001") {
-        title
-        description
-        duration
-      }
-    }
+query {
+  eventById(id: "01234567-abcd-abcd-abcd-000000000001") {
+    title
+    description
+    duration
+  }
+}
     </pre>
     <p>All events sorted and with a limit:</p>
     <pre>
-    query {
-      events(sortBy:DURATION limit:3) {
-        edges {
-          node {
-            title
-            description
-          }
-        }
+query {
+  events(sortBy: DURATION, limit: 3) {
+    edges {
+      node {
+        title
+        description
       }
     }
+  }
+}
     </pre>
     <p>All events of a specific series:</p>
     <pre>
-    query {
-      seriesById(id:"76543210-abcd-abcd-abcd-000000000001") {
-        events(sortBy:TITLE) {
-          edges {
-            node {
-              title
-              duration
-              series { id }
-            }
-          }
+query {
+  seriesById(id:"76543210-abcd-abcd-abcd-000000000001") {
+    events(sortBy: TITLE) {
+      edges {
+        node {
+          title
+          duration
+          series { id }
         }
       }
     }
+  }
+}
     </pre>
 
     <h2>Note about "connections", pagination and long lists</h2>
@@ -77,5 +94,6 @@
         But that's just because I didn't implement it.
         It's straight forward to add.
     </p>
+</main>
 </body>
 </html>
