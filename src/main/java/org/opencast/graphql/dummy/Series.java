@@ -19,6 +19,6 @@ public class Series {
         String after = env.getArgument("after");
         int limit = env.getArgumentOrDefault("limit", Integer.MAX_VALUE);
 
-        return Query.eventConnection(sortBy, limit, after, this.id);
+        return Util.eventConnection(sortBy, limit, after, this.id);
     }
 }

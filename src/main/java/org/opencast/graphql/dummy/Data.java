@@ -73,4 +73,17 @@ public class Data {
             "Blender is a software for 3D modeling, animation, rendering and more. This series "
                 + "contains movies created with Blender"),
     };
+
+    public static Event eventById(String id) {
+        return events.stream()
+            .filter(event -> event.id.equals(id))
+            .findFirst()
+            .orElse(null);
+    }
+    public static Series seriesById(String id) {
+        return Arrays.stream(series)
+            .filter(series -> series.id.equals(id))
+            .findFirst()
+            .orElse(null);
+    }
 }

@@ -1,7 +1,5 @@
 package org.opencast.graphql.dummy;
 
-import java.util.Arrays;
-
 public class Event {
     public String id;
     public String title;
@@ -20,10 +18,7 @@ public class Event {
     }
 
     public Series getSeries() {
-        return Arrays.stream(Data.series)
-            .filter(series -> series.id.equals(this.seriesID))
-            .findFirst()
-            .orElse(null);
+        return Data.seriesById(this.seriesID);
     }
 
     public static class Track {

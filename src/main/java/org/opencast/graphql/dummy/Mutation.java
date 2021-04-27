@@ -1,6 +1,5 @@
 package org.opencast.graphql.dummy;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -19,14 +18,8 @@ public class Mutation {
       throw new RuntimeException("'duration' must not be null");
     }
 
-    if (seriesId != null) {
-      var series = Arrays.stream(Data.series)
-          .filter(s -> s.id.equals(seriesId))
-          .findFirst()
-          .orElse(null);
-      if (series == null) {
-        throw new RuntimeException("'seriesId' is invalid: no such series exists!");
-      }
+    if (seriesId != null && Data.seriesById(seriesId) == null) {
+      throw new RuntimeException("'seriesId' is invalid: no such series exists!");
     }
 
     // This breaks when `nextId > 9999`, is susceptible to data races and is broken in a lot
