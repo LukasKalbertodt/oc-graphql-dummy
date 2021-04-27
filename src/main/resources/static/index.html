@@ -94,6 +94,38 @@ query {
         But that's just because I didn't implement it.
         It's straight forward to add.
     </p>
+
+    <h2>Mutations</h2>
+    <p>
+        Of course, GraphQL also allows mutating the data.
+        This example app includes only one such "mutation" endpoint, <code>addEvent</code>  .
+        Note that all data is managed in memory, so whenever I redeploy or restart this, all changes to the data are gone.
+        To try it out, use this "query":
+    </p>
+    <pre>
+mutation example($event: EventInput) {
+  addEvent(event: $event) {
+    id title
+  }
+}
+    </pre>
+    <p>
+        And at the bottom left of the GraphiQL, click "QUERY VARIABLES" and insert this (for example):
+    </p>
+    <pre>
+{
+  "event": {
+    "title": "Sintel",
+    "duration": 456,
+    "seriesId": "76543210-abcd-abcd-abcd-000000000002",
+    "description": "Dragon and a nice outro song"
+  }
+}
+    </pre>
+    <p>
+        As you can see from the query, the mutation endpoint returns the newly inserted event.
+        And you can, as usual, retrieve certain fields of that object.
+    </p>
 </main>
 </body>
 </html>
