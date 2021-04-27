@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class Data {
     public static int nextId = 1000;
 
-    public static ArrayList<Event> events = new ArrayList(Arrays.asList(
+    public static ArrayList<Event> events = new ArrayList<>(Arrays.asList(
         new Event("01234567-abcd-abcd-abcd-000000000001",
             "My Neighbor Totoro",
             "A cute movie about childhood",

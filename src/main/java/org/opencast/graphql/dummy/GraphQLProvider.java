@@ -5,7 +5,6 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -25,9 +24,6 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 public class GraphQLProvider {
 
     private GraphQL graphQL;
-
-    @Autowired
-    GraphQLDataFetchers graphQLDataFetchers;
 
     @Bean
     public GraphQL graphQL() {
@@ -52,9 +48,9 @@ public class GraphQLProvider {
     private RuntimeWiring buildWiring() {
         return RuntimeWiring.newRuntimeWiring()
             .type(newTypeWiring("Query")
-                .dataFetcher("eventById", graphQLDataFetchers.getEventById())
-                .dataFetcher("seriesById", graphQLDataFetchers.getSeriesById())
-                .dataFetcher("events", graphQLDataFetchers.getEvents())
+                .dataFetcher("eventById", Query::getEventById)
+                .dataFetcher("seriesById", Query::getSeriesById)
+                .dataFetcher("events", Query::getEvents)
             )
             .type(newTypeWiring("Mutation")
                 .dataFetcher("addEvent", Mutation::addEvent)
