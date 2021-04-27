@@ -56,6 +56,9 @@ public class GraphQLProvider {
                 .dataFetcher("seriesById", graphQLDataFetchers.getSeriesById())
                 .dataFetcher("events", graphQLDataFetchers.getEvents())
             )
+            .type(newTypeWiring("Mutation")
+                .dataFetcher("addEvent", Mutation::addEvent)
+            )
             .build();
     }
 }

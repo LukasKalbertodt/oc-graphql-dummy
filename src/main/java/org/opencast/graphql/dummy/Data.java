@@ -1,7 +1,12 @@
 package org.opencast.graphql.dummy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Data {
-    public static Event[] events = {
+    public static int nextId = 1000;
+
+    public static ArrayList<Event> events = new ArrayList(Arrays.asList(
         new Event("01234567-abcd-abcd-abcd-000000000001",
             "My Neighbor Totoro",
             "A cute movie about childhood",
@@ -59,8 +64,8 @@ public class Data {
             "76543210-abcd-abcd-abcd-000000000002",
             new Event.Track[] {
                 new Event.Track("video/webm", "https://example.com/cosmos.webm", 23.97f, 2048, 858),
-            }),
-    };
+            })
+    ));
 
     public static Series[] series = {
         new Series("76543210-abcd-abcd-abcd-000000000001", "Studio Ghibli Movies", null),

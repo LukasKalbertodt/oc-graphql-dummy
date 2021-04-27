@@ -7,6 +7,17 @@ type Query {
   events(sortBy: EventSort, limit: Int, after: String): EventConnection!
 }
 
+type Mutation {
+  addEvent(event: EventInput): Event
+}
+
+input EventInput {
+  title: String!
+  description: String
+  duration: Float!
+  seriesId: ID
+}
+
 type Event {
   id: ID!
   title: String!

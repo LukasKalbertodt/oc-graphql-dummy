@@ -3,13 +3,8 @@ package org.opencast.graphql.dummy;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.OptionalInt;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import javax.swing.text.html.Option;
 
 import graphql.relay.Connection;
 import graphql.relay.DefaultConnection;
@@ -23,7 +18,7 @@ public class GraphQLDataFetchers {
     public DataFetcher getEventById() {
         return dataFetchingEnvironment -> {
             String id = dataFetchingEnvironment.getArgument("id");
-            return Arrays.stream(Data.events)
+            return Data.events.stream()
                     .filter(event -> event.id.equals(id))
                     .findFirst()
                     .orElse(null);
@@ -51,7 +46,7 @@ public class GraphQLDataFetchers {
     }
 
     public static Connection eventConnection(String sortBy, int limit, String after, String seriesId) {
-        var events = Data.events.clone();
+        var events = Data.events.toArray(Event[]::new);
 
         // Filter by series, if a series is specified
         if (seriesId != null) {
@@ -71,7 +66,7 @@ public class GraphQLDataFetchers {
         var edgesPlusOne = Arrays.stream(events)
             .filter(after == null ? x -> true : skipUntilAfter(event -> event.id.equals(after)))
             .limit(1 + (long)limit)
-            .map(event -> new DefaultEdge<Event>(event, new DefaultConnectionCursor(event.id)))
+            .map(event -> new DefaultEdge<>(event, new DefaultConnectionCursor(event.id)))
             .collect(Collectors.toList());
         var edges = edgesPlusOne.size() == limit + 1 ? edgesPlusOne.subList(0, limit) : edgesPlusOne;
 
